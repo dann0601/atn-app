@@ -1,0 +1,16 @@
+-- CreateTable
+CREATE TABLE "EventAttendance" (
+    "id" SERIAL NOT NULL,
+    "eventId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "markedBy" TEXT NOT NULL DEFAULT 'self',
+
+    CONSTRAINT "EventAttendance_pkey" PRIMARY KEY ("id")
+);
+
+-- AddForeignKey
+ALTER TABLE "EventAttendance" ADD CONSTRAINT "EventAttendance_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EventAttendance" ADD CONSTRAINT "EventAttendance_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

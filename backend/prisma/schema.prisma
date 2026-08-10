@@ -13,50 +13,62 @@ datasource db {
 }
 
 model Team {
-  id Int @id @default(autoincrement())
-  name String
-  users User[]
+  id              Int              @id @default(autoincrement())
+  name            String
+  users           User[]
   invitationCodes InvitationCode[]
-  events Event[]
+  events          Event[]
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
-  passwordHash String
-  role String
-  teamId Int?
-  team Team? @relation(fields: [teamId], references: [id])
-  createdAt DateTime @default(now())
+  id                  Int               @id @default(autoincrement())
+  name                String
+  email               String            @unique
+  passwordHash        String
+  role                String
+  teamId              Int?
+  team                Team?             @relation(fields: [teamId], references: [id])
+  createdAt           DateTime          @default(now())
   usedInvitationCodes InvitationCode[]
-  createdEvents Event[]
+  createdEvents       Event[]
+  eventAttendances    EventAttendance[]
 }
 
 model InvitationCode {
-  id Int @id @default(autoincrement())
-  code String @unique
-  role String
-  teamId Int
-  team Team @relation(fields: [teamId], references: [id])
-  used Boolean @default(false)
+  id           Int      @id @default(autoincrement())
+  code         String   @unique
+  role         String
+  teamId       Int
+  team         Team     @relation(fields: [teamId], references: [id])
+  used         Boolean  @default(false)
   usedByUserId Int?
-  usedByUser User? @relation(fields: [usedByUserId], references: [id])
-  createdAt DateTime @default(now())
+  usedByUser   User?    @relation(fields: [usedByUserId], references: [id])
+  createdAt    DateTime @default(now())
 }
 
 model Event {
-  id Int @id @default(autoincrement())
-  title String
-  data DateTime
-  time String
-  location String
-  description String?
+  id              Int               @id @default(autoincrement())
+  title           String
+  data            DateTime
+  time            String
+  location        String
+  description     String?
   equipmentNeeded String?
-  teamId Int
-  team Team @relation(fields: [teamId], references: [id])
+  teamId          Int
+  team            Team              @relation(fields: [teamId], references: [id])
   createdbyUserId Int
-  createdByUser User @relation(fields: [createdbyUserId], references: [id])
-  status String @default("upcoming")
-  deteledAt DateTime?
+  createdByUser   User              @relation(fields: [createdbyUserId], references: [id])
+  status          String            @default("upcoming")
+  deteledAt       DateTime?
+  attendances     EventAttendance[]
+}
+
+model EventAttendance {
+  id       Int    @id @default(autoincrement())
+  eventId  Int
+  event    Event  @relation(fields: [eventId], references: [id])
+  userId   Int
+  user     User   @relation(fields: [userId], references: [id])
+  status   String @default("pending")
+  markedBy String @default("self")
 }
