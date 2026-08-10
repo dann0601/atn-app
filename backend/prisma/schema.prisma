@@ -16,6 +16,7 @@ model Team {
   id Int @id @default(autoincrement())
   name String
   users User[]
+  invitationCodes InvitationCode[]
 }
 
 model User {
@@ -26,5 +27,18 @@ model User {
   role String
   teamId Int?
   team Team? @relation(fields: [teamId], references: [id])
+  createdAt DateTime @default(now())
+  usedInvitationCodes InvitationCode[]
+}
+
+model InvitationCode {
+  id Int @id @default(autoincrement())
+  code String @unique
+  role String
+  teamId Int
+  team Team @relation(fields: [teamId], references: [id])
+  used Boolean @default(false)
+  usedByUserId Int?
+  usedByUser User? @relation(fields: [usedByUserId], references: [id])
   createdAt DateTime @default(now())
 }
