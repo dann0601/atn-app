@@ -17,6 +17,7 @@ model Team {
   name String
   users User[]
   invitationCodes InvitationCode[]
+  events Event[]
 }
 
 model User {
@@ -29,6 +30,7 @@ model User {
   team Team? @relation(fields: [teamId], references: [id])
   createdAt DateTime @default(now())
   usedInvitationCodes InvitationCode[]
+  createdEvents Event[]
 }
 
 model InvitationCode {
@@ -41,4 +43,20 @@ model InvitationCode {
   usedByUserId Int?
   usedByUser User? @relation(fields: [usedByUserId], references: [id])
   createdAt DateTime @default(now())
+}
+
+model Event {
+  id Int @id @default(autoincrement())
+  title String
+  data DateTime
+  time String
+  location String
+  description String?
+  equipmentNeeded String?
+  teamId Int
+  team Team @relation(fields: [teamId], references: [id])
+  createdbyUserId Int
+  createdByUser User @relation(fields: [createdbyUserId], references: [id])
+  status String @default("upcoming")
+  deteledAt DateTime?
 }
