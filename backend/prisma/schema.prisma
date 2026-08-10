@@ -21,17 +21,19 @@ model Team {
 }
 
 model User {
-  id                  Int               @id @default(autoincrement())
-  name                String
-  email               String            @unique
-  passwordHash        String
-  role                String
-  teamId              Int?
-  team                Team?             @relation(fields: [teamId], references: [id])
-  createdAt           DateTime          @default(now())
-  usedInvitationCodes InvitationCode[]
-  createdEvents       Event[]
-  eventAttendances    EventAttendance[]
+  id                   Int               @id @default(autoincrement())
+  name                 String
+  email                String            @unique
+  passwordHash         String
+  role                 String
+  teamId               Int?
+  team                 Team?             @relation(fields: [teamId], references: [id])
+  createdAt            DateTime          @default(now())
+  usedInvitationCodes  InvitationCode[]
+  createdEvents        Event[]
+  eventAttendances     EventAttendance[]
+  sentSwapRequests     SwapRequest[]     @relation("SwapRequestFromUser")
+  receivedSwapRequests SwapRequest[]     @relation("SwapRequestToUser")
 }
 
 model InvitationCode {
@@ -49,18 +51,19 @@ model InvitationCode {
 model Event {
   id              Int               @id @default(autoincrement())
   title           String
-  data            DateTime
+  date            DateTime
   time            String
   location        String
   description     String?
   equipmentNeeded String?
   teamId          Int
   team            Team              @relation(fields: [teamId], references: [id])
-  createdbyUserId Int
-  createdByUser   User              @relation(fields: [createdbyUserId], references: [id])
+  createdByUserId Int
+  createdByUser   User              @relation(fields: [createdByUserId], references: [id])
   status          String            @default("upcoming")
-  deteledAt       DateTime?
+  deletedAt       DateTime?
   attendances     EventAttendance[]
+  swapRequests    SwapRequest[]
 }
 
 model EventAttendance {
@@ -71,4 +74,17 @@ model EventAttendance {
   user     User   @relation(fields: [userId], references: [id])
   status   String @default("pending")
   markedBy String @default("self")
+}
+
+model SwapRequest {
+  id          Int       @id @default(autoincrement())
+  eventId     Int
+  event       Event     @relation(fields: [eventId], references: [id])
+  fromUserId  Int
+  fromUser    User      @relation("SwapRequestFromUser", fields: [fromUserId], references: [id])
+  toUserId    Int
+  toUser      User      @relation("SwapRequestToUser", fields: [toUserId], references: [id])
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+  respondedAt DateTime?
 }
