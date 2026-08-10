@@ -12,6 +12,40 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  super_admin
+  admin
+  member
+}
+
+enum InvitationRole {
+  admin
+  member
+}
+
+enum EventStatus {
+  upcoming
+  expired
+  cancelled
+}
+
+enum AttendanceStatus {
+  pending
+  confirmed
+  declined
+}
+
+enum AttendanceMarkedBy {
+  self
+  admin
+}
+
+enum SwapRequestStatus {
+  pending
+  accepted
+  declined
+}
+
 model Team {
   id              Int              @id @default(autoincrement())
   name            String
@@ -25,7 +59,7 @@ model User {
   name                 String
   email                String            @unique
   passwordHash         String
-  role                 String
+  role                 UserRole
   teamId               Int?
   team                 Team?             @relation(fields: [teamId], references: [id])
   createdAt            DateTime          @default(now())
@@ -37,15 +71,15 @@ model User {
 }
 
 model InvitationCode {
-  id           Int      @id @default(autoincrement())
-  code         String   @unique
-  role         String
+  id           Int            @id @default(autoincrement())
+  code         String         @unique
+  role         InvitationRole
   teamId       Int
-  team         Team     @relation(fields: [teamId], references: [id])
-  used         Boolean  @default(false)
+  team         Team           @relation(fields: [teamId], references: [id])
+  used         Boolean        @default(false)
   usedByUserId Int?
-  usedByUser   User?    @relation(fields: [usedByUserId], references: [id])
-  createdAt    DateTime @default(now())
+  usedByUser   User?          @relation(fields: [usedByUserId], references: [id])
+  createdAt    DateTime       @default(now())
 }
 
 model Event {
@@ -60,31 +94,31 @@ model Event {
   team            Team              @relation(fields: [teamId], references: [id])
   createdByUserId Int
   createdByUser   User              @relation(fields: [createdByUserId], references: [id])
-  status          String            @default("upcoming")
+  status          EventStatus       @default(upcoming)
   deletedAt       DateTime?
   attendances     EventAttendance[]
   swapRequests    SwapRequest[]
 }
 
 model EventAttendance {
-  id       Int    @id @default(autoincrement())
+  id       Int                @id @default(autoincrement())
   eventId  Int
-  event    Event  @relation(fields: [eventId], references: [id])
+  event    Event              @relation(fields: [eventId], references: [id])
   userId   Int
-  user     User   @relation(fields: [userId], references: [id])
-  status   String @default("pending")
-  markedBy String @default("self")
+  user     User               @relation(fields: [userId], references: [id])
+  status   AttendanceStatus   @default(pending)
+  markedBy AttendanceMarkedBy @default(self)
 }
 
 model SwapRequest {
-  id          Int       @id @default(autoincrement())
+  id          Int               @id @default(autoincrement())
   eventId     Int
-  event       Event     @relation(fields: [eventId], references: [id])
+  event       Event             @relation(fields: [eventId], references: [id])
   fromUserId  Int
-  fromUser    User      @relation("SwapRequestFromUser", fields: [fromUserId], references: [id])
+  fromUser    User              @relation("SwapRequestFromUser", fields: [fromUserId], references: [id])
   toUserId    Int
-  toUser      User      @relation("SwapRequestToUser", fields: [toUserId], references: [id])
-  status      String    @default("pending")
-  createdAt   DateTime  @default(now())
+  toUser      User              @relation("SwapRequestToUser", fields: [toUserId], references: [id])
+  status      SwapRequestStatus @default(pending)
+  createdAt   DateTime          @default(now())
   respondedAt DateTime?
 }
