@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { config } from 'dotenv';
-import { PrismaClient, UserRole } from '../generated/prisma/client';
+import { PrismaClient, UserRole } from '../src/generated/prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaPg } from '@prisma/adapter-pg';
 

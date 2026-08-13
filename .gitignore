@@ -10,6 +10,7 @@ out/
 
 # Generated files
 backend/generated/prisma/
+backend/src/generated/prisma/
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
 
