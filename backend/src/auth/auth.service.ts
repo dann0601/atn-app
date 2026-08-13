@@ -3,10 +3,14 @@ import { JoinDto } from './dto/join.dto';
 import { LoginDto } from './dto/login.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async join(joinDto: JoinDto) {
     const invitationCode = await this.prisma.invitationCode.findUnique({
@@ -84,6 +88,18 @@ export class AuthService {
     const { passwordHash, ...userWithoutPassword } = user;
     void passwordHash;
 
-    return userWithoutPassword;
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      teamId: user.teamId,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      accessToken,
+       user: userWithoutPassword,
+    };
   }
 }
