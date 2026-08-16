@@ -1,6 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { AttendanceMarkedBy } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -54,21 +53,92 @@ export class AttendanceService {
     });
   }
 
-  findAll() {
-    return `This action returns all attendance`;
+  async findAll(
+    eventId: number,
+    user: {
+      userId: number;
+      email: string;
+      role: string;
+      teamId: number | null;
+    },
+  ) {
+    if (!user.teamId) {
+      throw new BadRequestException('User must belong to a team to view attendance');
+    }
+
+    const event = await this.prisma.event.findFirst({
+      where: {
+        id: eventId,
+        teamId: user.teamId,
+        deletedAt: null,
+      },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    return this.prisma.eventAttendance.findMany({
+      where: {
+        eventId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      orderBy: {
+        user: {
+          name: 'asc',
+        },
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} attendance`;
-  }
+  async findOne(
+    eventId: number,
+    id: number,
+    user: {
+      userId: number;
+      email: string;
+      role: string;
+      teamId: number | null;
+    },
+  ) {
+    if (!user.teamId) {
+      throw new BadRequestException('User must belong to a team to view attendance');
+    }
 
-  update(id: number, updateAttendanceDto: UpdateAttendanceDto) {
-    void updateAttendanceDto;
+    const attendance = await this.prisma.eventAttendance.findFirst({
+      where: {
+        id,
+        eventId,
+        event: {
+          teamId: user.teamId,
+          deletedAt: null,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+    });
 
-    return `This action updates a #${id} attendance`;
-  }
+    if (!attendance) {
+      throw new NotFoundException('Attendance not found');
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} attendance`;
+    return attendance;
   }
 }
