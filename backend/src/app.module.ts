@@ -8,6 +8,7 @@ import { HealthModule } from './health/health.module';
 import { EventsModule } from './events/events.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { InvitationCodesModule } from './invitation-codes/invitation-codes.module';
+import { SwapRequestsModule } from './swap-requests/swap-requests.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { InvitationCodesModule } from './invitation-codes/invitation-codes.modul
     EventsModule,
     AttendanceModule,
     InvitationCodesModule,
+    SwapRequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
