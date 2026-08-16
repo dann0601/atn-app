@@ -100,6 +100,63 @@ export class AttendanceService {
     });
   }
 
+  async assignUser(
+    eventId: number,
+    targetUserId: number,
+    user: {
+      userId: number;
+      email: string;
+      role: string;
+      teamId: number | null;
+    },
+  ) {
+    if (!user.teamId) {
+      throw new BadRequestException('User must belong to a team to assign attendance');
+    }
+
+    const event = await this.prisma.event.findFirst({
+      where: {
+        id: eventId,
+        teamId: user.teamId,
+        deletedAt: null,
+      },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    const targetUser = await this.prisma.user.findFirst({
+      where: {
+        id: targetUserId,
+        teamId: user.teamId,
+      },
+    });
+
+    if (!targetUser) {
+      throw new NotFoundException('User not found in this team');
+    }
+
+    return this.prisma.eventAttendance.upsert({
+      where: {
+        eventId_userId: {
+          eventId,
+          userId: targetUserId,
+        },
+      },
+      update: {
+        status: 'pending',
+        markedBy: AttendanceMarkedBy.admin,
+      },
+      create: {
+        eventId,
+        userId: targetUserId,
+        status: 'pending',
+        markedBy: AttendanceMarkedBy.admin,
+      },
+    });
+  }
+
   async findOne(
     eventId: number,
     id: number,

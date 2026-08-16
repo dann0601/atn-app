@@ -41,6 +41,16 @@ export class AttendanceController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('users/:userId')
+  assignUser(
+    @Param('eventId') eventId: string,
+    @Param('userId') userId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.attendanceService.assignUser(+eventId, +userId, request.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(
     @Param('eventId') eventId: string,
