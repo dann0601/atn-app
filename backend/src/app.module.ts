@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { HealthModule } from './health/health.module';
 import { EventsModule } from './events/events.module';
 import { AttendanceModule } from './attendance/attendance.module';
+import { InvitationCodesModule } from './invitation-codes/invitation-codes.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AttendanceModule } from './attendance/attendance.module';
     HealthModule,
     EventsModule,
     AttendanceModule,
+    InvitationCodesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
