@@ -1,18 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Request } from 'express';
-
-type AuthenticatedRequest = Request & {
-  user: {
-    userId: number;
-    email: string;
-    role: string;
-    teamId: number | null;
-  };
-};
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 
 @Controller('events')
 export class EventsController {
@@ -22,24 +14,24 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   create(
     @Body() createEventDto: CreateEventDto,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.eventsService.create(createEventDto, request.user);
+    return this.eventsService.create(createEventDto, user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Req() request: AuthenticatedRequest) {
-    return this.eventsService.findAll(request.user);
+  findAll(@CurrentUser() user: AuthenticatedUser) {
+    return this.eventsService.findAll(user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(
     @Param('id') id: string,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.eventsService.findOne(+id, request.user);
+    return this.eventsService.findOne(+id, user);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -47,17 +39,17 @@ export class EventsController {
   update(
     @Param('id') id: string,
     @Body() updateEventDto: UpdateEventDto,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.eventsService.update(+id, updateEventDto, request.user);
+    return this.eventsService.update(+id, updateEventDto, user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(
     @Param('id') id: string,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.eventsService.remove(+id, request.user);
+    return this.eventsService.remove(+id, user);
   }
 }

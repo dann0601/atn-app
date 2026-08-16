@@ -1,17 +1,9 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Request } from 'express';
-
-type AuthenticatedRequest = Request & {
-  user: {
-    userId: number;
-    email: string;
-    role: string;
-    teamId: number | null;
-  };
-};
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 
 @Controller('events/:eventId/attendance')
 export class AttendanceController {
@@ -22,12 +14,12 @@ export class AttendanceController {
   create(
     @Param('eventId') eventId: string,
     @Body() createAttendanceDto: CreateAttendanceDto,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.attendanceService.create(
       +eventId,
       createAttendanceDto,
-      request.user,
+      user,
     );
   }
 
@@ -35,9 +27,9 @@ export class AttendanceController {
   @Get()
   findAll(
     @Param('eventId') eventId: string,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.attendanceService.findAll(+eventId, request.user);
+    return this.attendanceService.findAll(+eventId, user);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,9 +37,9 @@ export class AttendanceController {
   assignUser(
     @Param('eventId') eventId: string,
     @Param('userId') userId: string,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.attendanceService.assignUser(+eventId, +userId, request.user);
+    return this.attendanceService.assignUser(+eventId, +userId, user);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -55,8 +47,8 @@ export class AttendanceController {
   findOne(
     @Param('eventId') eventId: string,
     @Param('id') id: string,
-    @Req() request: AuthenticatedRequest,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.attendanceService.findOne(+eventId, +id, request.user);
+    return this.attendanceService.findOne(+eventId, +id, user);
   }
 }
