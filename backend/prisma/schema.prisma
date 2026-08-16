@@ -109,6 +109,8 @@ model EventAttendance {
   user     User               @relation(fields: [userId], references: [id])
   status   AttendanceStatus   @default(pending)
   markedBy AttendanceMarkedBy @default(self)
+
+  @@unique([eventId, userId])
 }
 
 model SwapRequest {

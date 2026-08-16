@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { HealthModule } from './health/health.module';
 import { EventsModule } from './events/events.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { EventsModule } from './events/events.module';
     AuthModule,
     HealthModule,
     EventsModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
