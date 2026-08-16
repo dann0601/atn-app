@@ -4,6 +4,9 @@ import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { UserRole } from '../generated/prisma/enums';
 
 @Controller('events/:eventId/attendance')
 export class AttendanceController {
@@ -32,7 +35,8 @@ export class AttendanceController {
     return this.attendanceService.findAll(+eventId, user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.super_admin)
   @Post('users/:userId')
   assignUser(
     @Param('eventId') eventId: string,

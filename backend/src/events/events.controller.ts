@@ -5,13 +5,17 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { UserRole } from '../generated/prisma/enums';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.super_admin)
   @Post()
-  @UseGuards(JwtAuthGuard)
   create(
     @Body() createEventDto: CreateEventDto,
     @CurrentUser() user: AuthenticatedUser,
@@ -34,7 +38,8 @@ export class EventsController {
     return this.eventsService.findOne(+id, user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.super_admin)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -44,7 +49,8 @@ export class EventsController {
     return this.eventsService.update(+id, updateEventDto, user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.super_admin)
   @Delete(':id')
   remove(
     @Param('id') id: string,
