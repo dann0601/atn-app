@@ -10,6 +10,7 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { InvitationCodesModule } from './invitation-codes/invitation-codes.module';
 import { SwapRequestsModule } from './swap-requests/swap-requests.module';
 import { UsersModule } from './users/users.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module';
     InvitationCodesModule,
     SwapRequestsModule,
     UsersModule,
+    TeamsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
