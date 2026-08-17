@@ -9,6 +9,7 @@ import { EventsModule } from './events/events.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { InvitationCodesModule } from './invitation-codes/invitation-codes.module';
 import { SwapRequestsModule } from './swap-requests/swap-requests.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SwapRequestsModule } from './swap-requests/swap-requests.module';
     AttendanceModule,
     InvitationCodesModule,
     SwapRequestsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
