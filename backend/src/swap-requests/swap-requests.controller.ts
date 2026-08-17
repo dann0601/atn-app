@@ -4,6 +4,7 @@ import { CreateSwapRequestDto } from './dto/create-swap-request.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
+import { RespondSwapRequestDto } from './dto/respond-swap-request.dto';
 
 @Controller('events/:eventId/swap-requests')
 export class SwapRequestsController {
@@ -30,5 +31,21 @@ export class SwapRequestsController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.swapRequestsService.findAll(+eventId, user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/respond')
+  respond(
+    @Param('eventId') eventId: string,
+    @Param('id') id: string,
+    @Body() respondSwapRequestDto: RespondSwapRequestDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.swapRequestsService.respond(
+      +eventId,
+      +id,
+      respondSwapRequestDto,
+      user,
+    );
   }
 }

@@ -3,6 +3,7 @@ import { CreateSwapRequestDto } from './dto/create-swap-request.dto';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { SwapRequestStatus } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
+import { RespondSwapRequestDto } from './dto/respond-swap-request.dto';
 
 @Injectable()
 export class SwapRequestsService {
@@ -95,6 +96,48 @@ export class SwapRequestsService {
       },
       orderBy: {
         createdAt: 'desc',
+      },
+    });
+  }
+
+  async respond(
+    eventId: number,
+    id: number,
+    respondSwapRequestDto: RespondSwapRequestDto,
+    user: AuthenticatedUser,
+  ) {
+    if (!user.teamId) {
+      throw new BadRequestException('User must belong to a team to respond to swap requests');
+    }
+
+    if (respondSwapRequestDto.status === SwapRequestStatus.pending) {
+      throw new BadRequestException('Swap request response must be accepted or declined');
+    }
+
+    const swapRequest = await this.prisma.swapRequest.findFirst({
+      where: {
+        id,
+        eventId,
+        toUserId: user.userId,
+        status: SwapRequestStatus.pending,
+        event: {
+          teamId: user.teamId,
+          deletedAt: null,
+        },
+      },
+    });
+
+    if (!swapRequest) {
+      throw new NotFoundException('Swap request not found');
+    }
+
+    return this.prisma.swapRequest.update({
+      where: {
+        id,
+      },
+      data: {
+        status: respondSwapRequestDto.status,
+        respondedAt: new Date(),
       },
     });
   }
