@@ -49,6 +49,7 @@ Thumbs.db
 
 # IDEs and editors
 .idea/
+frontend/.vscode/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
